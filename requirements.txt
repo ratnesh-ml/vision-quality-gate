@@ -1,4 +1,0 @@
-numpy>=1.26
-scikit-learn>=1.4
-pillow>=10.0
-pytest>=8.0

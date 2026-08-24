@@ -42,7 +42,9 @@ def extract_features(images: np.ndarray) -> np.ndarray:
     return np.column_stack([images.mean(axis=(1, 2)), images.std(axis=(1, 2)), gradients_y, gradients_x, blocks.reshape(len(images), -1)])
 
 
-def train_quality_gate(images: np.ndarray, labels: np.ndarray, seed: int = 42) -> VisionResult:
+def train_quality_gate(images: np.ndarray, labels: np.ndarray, seed: int = 42, confidence_threshold: float = .60) -> VisionResult:
+    if not 0 < confidence_threshold < 1:
+        raise ValueError("confidence_threshold must be between 0 and 1")
     X = extract_features(images)
     X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=.25, random_state=seed, stratify=labels)
     model = make_pipeline(StandardScaler(), LogisticRegression(max_iter=600, random_state=seed))
@@ -50,7 +52,7 @@ def train_quality_gate(images: np.ndarray, labels: np.ndarray, seed: int = 42) -
     probabilities = model.predict_proba(X_test)
     confidence = probabilities.max(axis=1)
     predictions = model.classes_[probabilities.argmax(axis=1)]
-    abstain = confidence < .60
+    abstain = confidence < confidence_threshold
     safe_predictions = predictions[~abstain]
     safe_labels = y_test[~abstain]
     metrics = {
@@ -61,7 +63,17 @@ def train_quality_gate(images: np.ndarray, labels: np.ndarray, seed: int = 42) -
     return VisionResult(model, metrics, float(abstain.mean()))
 
 
-def evaluate(seed: int = 42) -> dict[str, float]:
+def evaluate(seed: int = 42, confidence_threshold: float = .60) -> dict[str, float]:
     images, labels = make_dataset(seed=seed)
-    result = train_quality_gate(images, labels, seed=seed)
+    result = train_quality_gate(images, labels, seed=seed, confidence_threshold=confidence_threshold)
     return {**result.metrics, "abstention_rate": result.abstention_rate}
+
+
+def evaluate_thresholds(seed: int = 42, thresholds: tuple[float, ...] = (.50, .60, .70, .80)) -> list[dict[str, float]]:
+    """Compare coverage and covered-set quality across abstention thresholds."""
+    if not thresholds:
+        raise ValueError("thresholds cannot be empty")
+    return [
+        {"confidence_threshold": threshold, **evaluate(seed=seed, confidence_threshold=threshold)}
+        for threshold in thresholds
+    ]
