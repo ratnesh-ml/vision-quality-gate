@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/ratnesh-ml/vision-quality-gate/actions/workflows/test.yml/badge.svg)](https://github.com/ratnesh-ml/vision-quality-gate/actions/workflows/test.yml)
 
-> **Portfolio demo:** [Open the Ratnesh ML Lab showcase](https://ratnesh-ml-brwn1i9o5-ratnezhsingh-6317.vercel.app)
+> **Portfolio demo:** [Open the Ratnesh ML Lab showcase](https://ratnesh-ml-lab.vercel.app)
 This is my computer-vision project for learning the part that is easy to skip: a model should be allowed to say **“I am not confident enough.”**
 
 The repository generates small grayscale inspection images containing clean surfaces, scratches, or spots. It extracts image statistics and block-level features, trains a classifier, and measures both accuracy and coverage. The coverage number tells us how often the system makes a decision instead of forcing a guess.
