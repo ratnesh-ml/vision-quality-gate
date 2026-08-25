@@ -1,0 +1,24 @@
+name: Vision-quality bug
+description: Report a reproducible threshold, abstention, evaluation, data-contract, or documentation issue.
+title: "bug: "
+body:
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed inspection behavior
+      description: Include the command, safe image metadata or fixture, and predicted/abstained outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Data safety
+      options:
+        - label: I did not attach proprietary, personal, or safety-critical inspection images.
+          required: true
